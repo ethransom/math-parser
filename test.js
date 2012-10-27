@@ -90,4 +90,66 @@ describe('Parser', function(){
 		})
 	})
 
+	describe('order of operations', function() {
+		it('puts multiply before add', function(done) {
+			parse('5 * 5 + 2', function (result) {
+				expect(result).to.be(27);
+				parse('2 + 3 * 2', function (result) {
+					expect(result).to.be(8);
+					done();
+				})
+			})
+		})
+
+		it('puts multiply before subtract', function(done) {
+			parse('5 * 5 - 2', function (result) {
+				expect(result).to.be(23);
+				parse('2 - 3 * 2', function (result) {
+					expect(result).to.be(-4);
+					done();
+				})
+			})
+		})
+
+		it('puts divide before add', function(done) {
+			parse('5 / 5 + 2', function (result) {
+				expect(result).to.be(3);
+				parse('2 + 6 / 3', function (result) {
+					expect(result).to.be(4);
+					done();
+				})
+			})
+		})
+
+		it('puts divide before subtract', function(done) {
+			parse('5 / 5 - 2', function (result) {
+				expect(result).to.be(-1);
+				parse('2 - 6 / 3', function (result) {
+					expect(result).to.be(0);
+					done();
+				})
+			})
+		})
+
+		it('puts exponents before addition and subtraction', function(done) {
+			parse('3 ^ 2 - 2', function (result) {
+				expect(result).to.be(7);
+				parse('4 + 2 ^ 3', function (result) {
+					expect(result).to.be(12);
+					done();
+				})
+			})
+		})
+
+		it('puts exponents before multiplication and division', function(done) {
+			parse('5 ^ 2 / 5', function (result) {
+				expect(result).to.be(5);
+				parse('34 - 8 ^ 2', function (result) {
+					expect(result).to.be(-30);
+					done();
+				})
+			})
+		})
+	})
+
 })

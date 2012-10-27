@@ -210,11 +210,19 @@ class Parser : Object {
       if (type == TokenType.NUMBER) {
         out_queue.add (list.dequeue ());
       } else if (type == TokenType.OPERATOR) {
-        operator_stack.add (list.dequeue ());
+        if (print_debug)
+          stdout.printf("For operator %s\n", token.to_string());
         
-        // while (list.last().type == TokenType.OPERATOR) {
-          
-        // }
+        while (operator_stack.size > 0
+          && operator_stack.last().type == TokenType.OPERATOR 
+          && operator_stack.last().get_precedence() > token.get_precedence()) {
+          if (print_debug)
+            stdout.printf("\tPopping %s\n", operator_stack.last().to_string());
+          out_queue.add(operator_stack.pop());
+        }
+        if (print_debug)
+          stdout.printf("\tPushing %s\n", list.last().to_string());
+        operator_stack.add(list.dequeue());
       } else if (type == TokenType.LEFT_PAREN) {
         operator_stack.add (list.dequeue ());
       } else if (type == TokenType.RIGHT_PAREN) {
