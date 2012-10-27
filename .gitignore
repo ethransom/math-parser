@@ -1,0 +1,9 @@
+parser
+milestones
+node_modules
+*.c
+
+# Executables
+*.exe
+*.out
+*.app
