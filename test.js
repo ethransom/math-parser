@@ -51,7 +51,11 @@ describe('Parser', function(){
 		['3 ^ 2 - 2', 7],
 		['4 + 2 ^ 3',12],
 		['5 ^ 2 / 5',5],
-		['34 - 8 ^ 2',-30]
+		['34 - 8 ^ 2',-30],
+		// ajacent multiplication
+		['4(3)',12],
+		['4(2(3))',24],
+		['5(2*5+3)',65]
 	];
 
 	expressions.forEach(function (expression) {
