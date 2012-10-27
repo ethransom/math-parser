@@ -25,16 +25,21 @@ describe('Parser', function(){
 		})
 	}
 	var expressions = [
+		// simple operations
 		['2 + 2',4],
 		['5 - 3',2],
 		['5 * 6',30],
 		['12 / 4',3],
+		// negatives
 		['5 - 10',-5],
+		// decimals
 		['2.07 + 3.13',5.20],
 		['6.39 - 4.27',2.12],
+		// exponents
 		['2^2',4],
 		['8^(1/3)',2],
 		['8^(2/3)',4],
+		// order of operations
 		['5 * 5 + 2',27],
 		['2 + 3 * 2',8],
 		['5 * 5 - 2',23],
