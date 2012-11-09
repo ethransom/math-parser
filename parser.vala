@@ -329,7 +329,7 @@ public class MathShell {
         break;
 
       double result = Parser.evaluate(exp);
-      stdout.printf("%f\n", result);
+      Program.print_number (result);
     }
   }
 }
@@ -350,6 +350,17 @@ public class Program {
     {"shell", 's', 0, OptionArg.NONE, ref shell, "Enter interactive shell", null},
     { null }
   };
+
+  // prints whole numbers without decimal places
+  public static void print_number (double num) {
+    double rounded = Math.round (num);
+
+    if (num == rounded) {
+      stdout.printf("%d\n", (int)num);
+    } else {
+      stdout.printf("%f\n", num);
+    }
+  }
 
   public static int main (string[] args) {
     // arguments parsing
@@ -384,10 +395,9 @@ public class Program {
     // begin actual parsing
     try {
       for (int i = 1; i<args.length; i++) {
-        stdout.printf("%f\n",
+        double result = Parser.evaluate (args[i]);
 
-          Parser.evaluate (args[i])
-        );
+        print_number (result);
       }
     } catch (MathError e) {
       stderr.printf("Error: %s\n", e.message);
