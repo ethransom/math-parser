@@ -145,6 +145,14 @@ class Parser : Object {
     return ("+" in input || "-" in input || "*" in input || "/" in input || "^" in input);
   }
 
+  static bool is_left_paren (string input) {
+    return (input == "(" || input == "[");
+  }
+
+  static bool is_right_paren (string input) {
+    return (input == ")" || input == "]");
+  }
+
   static void print_list(TokenList list) {
     for (int i = 0; i < list.size; i++) {
       stdout.printf("%s\n", list.get(i).to_string () );
@@ -176,9 +184,9 @@ class Parser : Object {
         list.add( new Token (TokenType.NUMBER, c) );
       } else if (is_operator (c)) {
         list.add( new Token (TokenType.OPERATOR, c) );      
-      } else if (c == "(") {
+      } else if (is_left_paren (c)) {
         list.add (new Token (TokenType.LEFT_PAREN, c));
-      } else if (c == ")") {
+      } else if (is_right_paren (c)) {
         list.add (new Token (TokenType.RIGHT_PAREN, c));
       } else {
         // stdout.printf ("Unknown token: %s\n", c);

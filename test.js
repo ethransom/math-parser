@@ -52,7 +52,10 @@ describe('Parser', function(){
 		['3 ^ 2 - 2', 7],
 		['4 + 2 ^ 3',12],
 		['5 ^ 2 / 5',5],
-		['34 - 8 ^ 2',-30]
+		['34 - 8 ^ 2',-30],
+		// square brackets are identical to parens
+		['[[4]]',4],
+		['2 * [2 + 3]', 10]
 	];
 
 	expressions.forEach(function (expression) {
