@@ -185,6 +185,15 @@ class Parser : Object {
       } else if (is_operator (c)) {
         list.add( new Token (TokenType.OPERATOR, c) );      
       } else if (is_left_paren (c)) {
+        // handle implicit multiplication, e.g. 4(3)
+        if (list.size > 0 && list.last().type == TokenType.NUMBER) {
+          if (print_debug)
+            stdout.printf ("Assuming multiplication between %s and LeftParen(\"(\")\n", list.last().to_string());
+
+          // insert implied multiply operator
+          list.add (new Token (TokenType.OPERATOR, "*"));
+        }
+
         list.add (new Token (TokenType.LEFT_PAREN, c));
       } else if (is_right_paren (c)) {
         list.add (new Token (TokenType.RIGHT_PAREN, c));
