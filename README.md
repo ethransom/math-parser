@@ -6,10 +6,10 @@ A mathmatical expression evaluator written in [vala](https://live.gnome.org/Vala
 
 ## Hacking
 
-Tests are written in javascript. You will need [Mocha](http://visionmedia.github.com/mocha/) and [expect.js](https://github.com/LearnBoost/expect.js/). Install like so:
+Tests are written in javascript. You will need [Mocha](http://visionmedia.github.com/mocha/) and [Chai](http://chaijs.com/). Install like so:
 
 	$ npm install mocha -g
-	$ npm install expect.js
+	$ npm install chai
 
  * __make test -B__ - Run the tests in `test.js`
  * __make parser -B__ - Build the parser

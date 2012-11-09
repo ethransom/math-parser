@@ -1,4 +1,4 @@
-var expect = require('expect.js');
+var expect = require('chai').expect;
 var spawn = require('child_process').spawn;
 
 describe('Parser', function(){
@@ -20,7 +20,7 @@ describe('Parser', function(){
 
 	function assert_parse(exp, answer, done) {
 		parse(exp, function(result) {
-			expect(result).to.be(answer);
+			expect(result).to.equal(answer);
 			done();
 		})
 	}
