@@ -2,27 +2,42 @@ var expect = require('chai').expect;
 var spawn = require('child_process').spawn;
 
 describe('Parser', function(){
-	function parse(exp, done) {
+	function Parse (exp, done) {
+		this.exp = exp;
+		this.messages = "";
+		this.callback = done;
+		this.exitCode = null;
+		this.result = null;
+
+		var that = this;
+
 		var parser = spawn('./parser', [exp]);
 
 		parser.stdout.on('data', function (data) {
-			var result = parseFloat(
-				data.toString().trim()
-			);
-			done(result);
+			that.messages += data.toString();
 		});
 
 		parser.on('exit', function (code) {
-			if (code != 0)
-				throw new Error("Parser terminated with code " + code)
+			that.exit.call(that, code);
 		});
+	}
+	Parse.prototype.exit = function (code) {
+		this.exitCode = code;
+
+		if (code == 0) {
+			this.result = parseFloat(
+				this.messages.trim()
+			);
+		}
+
+		this.callback(this.result);
 	}
 
 	function assert_parse(exp, answer, done) {
-		parse(exp, function(result) {
+		new Parse(exp, function(result) {
 			expect(result).to.equal(answer);
 			done();
-		})
+		});
 	}
 	var expressions = [
 		// simple operations
