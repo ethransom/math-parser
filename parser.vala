@@ -318,6 +318,22 @@ class Parser : Object {
 // used in interactive mode
 // TODO: variables?
 public class MathShell {
+  // prints whole numbers without decimal places
+  void print_number (double num) {
+    double rounded = Math.round (num);
+
+    if (num == rounded) {
+      stdout.printf("%d\n", (int)num);
+    } else {
+      stdout.printf("%f\n", num);
+    }
+  }
+
+  public void eval (string exp) {
+    double result = Parser.evaluate(exp);
+    print_number (result);
+  }
+
   public void loop() {
     while (true) {
       stdout.printf(">");
@@ -328,8 +344,7 @@ public class MathShell {
       if (exp == "exit")
         break;
 
-      double result = Parser.evaluate(exp);
-      Program.print_number (result);
+      eval(exp);
     }
   }
 }
@@ -350,17 +365,6 @@ public class Program {
     {"shell", 's', 0, OptionArg.NONE, ref shell, "Enter interactive shell", null},
     { null }
   };
-
-  // prints whole numbers without decimal places
-  public static void print_number (double num) {
-    double rounded = Math.round (num);
-
-    if (num == rounded) {
-      stdout.printf("%d\n", (int)num);
-    } else {
-      stdout.printf("%f\n", num);
-    }
-  }
 
   public static int main (string[] args) {
     // arguments parsing
@@ -394,10 +398,9 @@ public class Program {
 
     // begin actual parsing
     try {
+      var shell = new MathShell();
       for (int i = 1; i<args.length; i++) {
-        double result = Parser.evaluate (args[i]);
-
-        print_number (result);
+        shell.eval (args[i]);
       }
     } catch (MathError e) {
       stderr.printf("Error: %s\n", e.message);
