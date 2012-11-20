@@ -71,7 +71,7 @@ describe('Parser', function(){
 		// square brackets are identical to parens
 		['[[4]]',4],
 		['2 * [2 + 3]', 10],
-		// ajacent multiplication
+		// adjacent multiplication
 		['4(3)',12],
 		['4(2(3))',24],
 		['5(2*5+3)',65]
