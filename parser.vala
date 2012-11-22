@@ -282,7 +282,14 @@ class Parser : Object {
 
       if (token.type == TokenType.OPERATOR) {
         Operand operand_1 = operands.pop ();
-        Operand operand_2 = operands.pop ();
+
+        Operand operand_2;
+        // handle minus operator being used for negation, not subtraction
+        if ((token.val == "-" || token.val == "+") && operands.size == 0) {
+          operand_2 = new Operand.from_double (0.00);
+        } else {
+          operand_2 = operands.pop ();
+        }
         double result = operand_2.perform_operation (token.val, operand_1);
         var operand = new Operand.from_double (result);
         operands.add (operand);

@@ -74,7 +74,11 @@ describe('Parser', function(){
 		// adjacent multiplication
 		['4(3)',12],
 		['4(2(3))',24],
-		['5(2*5+3)',65]
+		['5(2*5+3)',65],
+		// negative input (leading space prevents program confusing number with flag)
+		[' -5', -5],
+		['4 + -2', 2],
+		[' -(3 + 2)', -5]
 	];
 
 	expressions.forEach(function (expression) {
