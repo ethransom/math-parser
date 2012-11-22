@@ -359,6 +359,19 @@ class Parser : Object {
     
     return result;
   }
+
+  public static string to_postfix (string input) {
+    var tokens = tokenize_string (input);
+    var postfix_tokens = parse (tokens);
+
+    string output = "";
+    while (postfix_tokens.size > 0) {
+      var token = postfix_tokens.dequeue();
+      output += token.val;
+    }
+
+    return output;
+  }
 }
 
 // used in interactive mode
@@ -405,10 +418,12 @@ public class Program {
 
   public static bool debug = false;
   static bool shell = false;
+  static bool print_postfix = false;
 
   const OptionEntry[] options = {
     {"debug", 'd', 0, OptionArg.NONE, ref debug, "Print debug messages", null},
     {"shell", 's', 0, OptionArg.NONE, ref shell, "Enter interactive shell", null},
+    {"print_postfix", 'p', 0, OptionArg.NONE, ref print_postfix, "Convert expression(s) to postfix", null},
     { null }
   };
 
@@ -441,6 +456,15 @@ public class Program {
     }
 
     Parser.print_debug = debug;
+
+    if (print_postfix) {
+      for (int i = 1; i<args.length; i++) {
+        string output = Parser.to_postfix (args[i]);
+        stdout.printf ("%s\n", output);
+      }
+
+      return ExitCodes.SUCCESS;
+    }
 
     // begin actual parsing
     try {
