@@ -45,6 +45,7 @@ describe('Parser', function(){
 		['5 - 3',2],
 		['5 * 6',30],
 		['12 / 4',3],
+		['12 % 5', 2],
 		// negatives
 		['5 - 10',-5],
 		// decimals
@@ -68,6 +69,8 @@ describe('Parser', function(){
 		['4 + 2 ^ 3',12],
 		['5 ^ 2 / 5',5],
 		['34 - 8 ^ 2',-30],
+		['8 * 9 % 5', 2],
+		['10 % 3 * 5', 5],
 		// square brackets are identical to parens
 		['[[4]]',4],
 		['2 * [2 + 3]', 10],

@@ -83,6 +83,7 @@ class Token : Object {
 
       case "*":
       case "/":
+      case "%":
         return 3;
 
       case "^":
@@ -118,6 +119,8 @@ class Operand : Object {
       return this.val * operand.val;
     case "/":
       return this.val / operand.val;
+    case "%":
+      return this.val % operand.val;
     case "^":
       return Math.pow(this.val, operand.val); 
     default:
@@ -142,7 +145,7 @@ class Parser : Object {
 
   static bool is_operator (string input) {
     // return Regex.match_simple (@"(+|-|*|/)", input);
-    return ("+" in input || "-" in input || "*" in input || "/" in input || "^" in input);
+    return ("+" in input || "-" in input || "*" in input || "/" in input || "^" in input || "%" in input);
   }
 
   static bool is_left_paren (string input) {
