@@ -186,7 +186,9 @@ class SyntaxTree : Object {
 
       if (this.root == null) {
         this.root = new TreeNode (token);
-        stdout.printf("Appending %s as root node\n", token.to_string());
+
+        if (Program.debug)
+          stdout.printf("Appending %s as root node\n", token.to_string());
       } else
         this.root.append (new TreeNode (token));
 
