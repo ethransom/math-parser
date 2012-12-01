@@ -149,18 +149,42 @@ class TreeNode : Object {
     this.token = token;
   }
 
-  public void append (TreeNode node) {
-    if (this.token.type == TokenType.NUMBER)
-      assert_not_reached ();
+  public bool append (TreeNode node) {
+    if (Program.debug) stdout.printf("Trying to append %s to %s\n", node.token.to_string(), this.token.to_string());
 
-    if (this.right == null)
+    if (this.token.type == TokenType.NUMBER)
+      return false;
+
+    // this node has room, append somewhere
+    if (this.right == null) {
       this.right = node;
-    else if (this.left == null) 
+      if (Program.debug) stdout.printf("Appending %s to right of %s\n", node.token.to_string(), this.token.to_string() );
+      return true;
+    } 
+
+    if (this.right.token.type == TokenType.OPERATOR) {
+      if (this.right.append (node)) {
+        if (Program.debug) stdout.printf("Appending %s to %s (which is right of %s)\n", node.token.to_string(), this.right.token.to_string(), this.token.to_string() );
+        return true;  // everything went well
+      }
+    }
+
+    if (this.left == null) {
       this.left = node;
-    else if (this.right.token.type == TokenType.OPERATOR)
-      this.right.append (node);
-    else if (this.left.token.type == TokenType.OPERATOR)
-      this.left.append (node);
+      if (Program.debug) stdout.printf("Appending %s to left of %s\n", node.token.to_string(), this.token.to_string() );
+      return true;
+    }
+
+    if (this.left.token.type == TokenType.OPERATOR) {
+      if (this.left.append (node)) {
+        if (Program.debug) stdout.printf("Appending %s to %s (which is left of %s)\n", node.token.to_string(), this.left.token.to_string(), this.token.to_string() );
+        return true;
+      }
+    }
+
+    // this node is completely full
+    if (Program.debug) stdout.printf("Could not append %s to %s\n", node.token.to_string(), this.token.to_string());
+    return false;
   }
 
   public double evaluate () {
