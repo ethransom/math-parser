@@ -120,14 +120,16 @@ class TreeNode : Object {
   public TreeNode right = null;
   public TreeNode left = null;
 
-  public string print () {
-    string output = this.token.to_string() + "\n";
+  public string print (string input) {
+    string output = input + this.token.to_string() + "\n";
+
+    string prepend = input + "  ";
 
     if (this.right != null)
-      output += "\tr: " + this.right.print () + "\n";
+      output += this.right.print (prepend);
 
     if (this.left != null)
-      output += "\tl: " + this.left.print () + "\n";
+      output += this.left.print (prepend);
 
     return output;
   }
@@ -161,11 +163,12 @@ class TreeNode : Object {
 class SyntaxTree : Object {
   TreeNode root = null;
 
-  string print () {
-    if (this.root != null)
-      return this.root.print();
+  string to_string () {
+    if (this.root == null) 
+      return "";
 
-    return "";
+    stdout.printf ("\nPrinting SyntaxTree: \n");
+    return this.root.print("") + "\n";
   }
 
   public SyntaxTree () {
@@ -195,7 +198,7 @@ class SyntaxTree : Object {
     }
 
     if (Program.debug)
-      stdout.printf (this.print ());
+      stdout.printf (this.to_string ());
   }
 
   public double evaluate () {
