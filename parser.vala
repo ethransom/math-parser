@@ -28,8 +28,18 @@ class AdvancedList<G> : ArrayList<G> {
   }
 }
 
-class TokenList : AdvancedList<Token> {}
-class OperandList : AdvancedList<Operand> {}
+class TokenList : AdvancedList<Token> {
+  public string to_string () {
+    string output = "";
+
+    while (this.size > 0) {
+      var token = this.dequeue();
+      output += token.val;
+    }
+
+    return output;
+  }
+}
 
 
 enum TokenType {
@@ -93,43 +103,144 @@ class Token : Object {
         assert_not_reached();
     }
   }
-}
 
-// the numerical equivalent of number tokens
-[Compact]
-class Operand : Object {
-  public double val;
+  // placeholder
+  public static double operate (string operation, double a, double b) {
+    if (Program.debug)
+      stdout.printf ("Performing \"%s\" operation on %f, %f\n", operation, a, b);
 
-  public Operand (string val) {
-    this.val = double.parse(val);
-  }
-
-  public Operand.from_double (double val) {
-    this.val = val;
-  }
-
-  public double perform_operation (string operator, Operand operand) {
-    // stdout.printf ("Performing \"%s\" operation on %f, %f\n", operator, this.val, operand.val);
-    switch (operator) {
+    switch (operation) {
     case "+":
-      return this.val + operand.val;
+      return a + b;
     case "-":
-      return this.val - operand.val;
+      return a - b;
     case "*":
-      return this.val * operand.val;
+      return a * b;
     case "/":
-      return this.val / operand.val;
+      return a / b;
     case "%":
-      return this.val % operand.val;
+      return a % b;
     case "^":
-      return Math.pow(this.val, operand.val); 
+      return Math.pow(a, b);
     default:
       assert_not_reached ();
     }
   }
+}
+
+class TreeNode : Object {
+  public Token token;
+
+  public TreeNode right = null;
+  public TreeNode left = null;
+
+  public string print (string input) {
+    string output = input + this.token.to_string() + "\n";
+
+    string prepend = input + "  ";
+
+    if (this.right != null)
+      output += this.right.print (prepend);
+
+    if (this.left != null)
+      output += this.left.print (prepend);
+
+    return output;
+  }
+
+  public TreeNode (Token token) {
+    this.token = token;
+  }
+
+  public bool append (TreeNode node) {
+    if (Program.debug) stdout.printf("Trying to append %s to %s\n", node.token.to_string(), this.token.to_string());
+
+    if (this.token.type == TokenType.NUMBER)
+      return false;
+
+    // this node has room, append somewhere
+    if (this.right == null) {
+      this.right = node;
+      if (Program.debug) stdout.printf("Appending %s to right of %s\n", node.token.to_string(), this.token.to_string() );
+      return true;
+    } 
+
+    if (this.right.token.type == TokenType.OPERATOR) {
+      if (this.right.append (node)) {
+        if (Program.debug) stdout.printf("Appending %s to %s (which is right of %s)\n", node.token.to_string(), this.right.token.to_string(), this.token.to_string() );
+        return true;  // everything went well
+      }
+    }
+
+    if (this.left == null) {
+      this.left = node;
+      if (Program.debug) stdout.printf("Appending %s to left of %s\n", node.token.to_string(), this.token.to_string() );
+      return true;
+    }
+
+    if (this.left.token.type == TokenType.OPERATOR) {
+      if (this.left.append (node)) {
+        if (Program.debug) stdout.printf("Appending %s to %s (which is left of %s)\n", node.token.to_string(), this.left.token.to_string(), this.token.to_string() );
+        return true;
+      }
+    }
+
+    // this node is completely full
+    if (Program.debug) stdout.printf("Could not append %s to %s\n", node.token.to_string(), this.token.to_string());
+    return false;
+  }
+
+  public double evaluate () {
+    if (this.token.type == TokenType.NUMBER)
+      return double.parse(this.token.val);
+    else // assume operator
+      return Token.operate(this.token.val, this.left.evaluate(), this.right.evaluate());
+  }
+}
+
+class SyntaxTree : Object {
+  TreeNode root = null;
 
   public string to_string () {
-    return this.val.to_string();
+    if (this.root == null) 
+      return "";
+
+    stdout.printf ("\nPrinting SyntaxTree: \n");
+    return this.root.print("") + "\n";
+  }
+
+  public SyntaxTree () {
+    stdout.printf("Construct\n");
+  }
+
+  public SyntaxTree.from_postfix (TokenList postfix_tokens) {
+    if (Program.debug)
+      stdout.printf("Constructing from post-fix\n");
+
+    var working_node = this.root;
+
+    while (postfix_tokens.size > 0) {
+      var token = postfix_tokens.pop();
+      
+      if (Program.debug)
+        stdout.printf("Popping %s\n", token.to_string());
+
+      if (this.root == null) {
+        this.root = new TreeNode (token);
+
+        if (Program.debug)
+          stdout.printf("Appending %s as root node\n", token.to_string());
+      } else
+        this.root.append (new TreeNode (token));
+
+    }
+
+    if (Program.debug)
+      stdout.printf (this.to_string ());
+  }
+
+  public double evaluate () {
+    return this.root.evaluate();
   }
 }
 
@@ -273,50 +384,13 @@ class Parser : Object {
     return out_queue;
   }
 
-  // simple stack-based post-fix evaluator
-  static double interpret (TokenList tokens) throws MathError {
-    var operands = new OperandList();
-    if (print_debug) 
-      stdout.printf ("Evaluating expression...\n");
-
-    while (tokens.size > 0) {
-      // do stuff
-      var token = tokens.dequeue();
-
-      if (token.type == TokenType.OPERATOR) {
-        Operand operand_1 = operands.pop ();
-
-        Operand operand_2;
-        // handle minus operator being used for negation, not subtraction
-        if ((token.val == "-" || token.val == "+") && operands.size == 0) {
-          operand_2 = new Operand.from_double (0.00);
-        } else {
-          operand_2 = operands.pop ();
-        }
-        double result = operand_2.perform_operation (token.val, operand_1);
-        var operand = new Operand.from_double (result);
-        operands.add (operand);
-      } else if (token.type == TokenType.NUMBER) {
-        var operand = new Operand (token.val);
-        if (print_debug)
-          stdout.printf ("%s -> operand stack\n", operand.to_string());
-        operands.add (operand);
-      }
-    }
-
-    if (operands.size != 1) // something went wrong
-      assert_not_reached ();
-    
-    if (print_debug)
-      stdout.printf ("Evaluation Complete\n");
-    return operands.first().val;
-  }
-
   // chains the above three methods to do something awesome!
   public static double evaluate (string input) {
     var tokens = tokenize_string (input);
     var postfix_tokens = parse (tokens);
-    double result = interpret (postfix_tokens);
+    
+    var tree = new SyntaxTree.from_postfix (postfix_tokens);
+    double result = tree.evaluate();
     
     if (print_debug)
       stdout.printf("\nResult of Evaluation: %f\n", result);
@@ -324,17 +398,11 @@ class Parser : Object {
     return result;
   }
 
-  public static string to_postfix (string input) {
+  public static TokenList to_postfix (string input) {
     var tokens = tokenize_string (input);
     var postfix_tokens = parse (tokens);
 
-    string output = "";
-    while (postfix_tokens.size > 0) {
-      var token = postfix_tokens.dequeue();
-      output += token.val;
-    }
-
-    return output;
+    return postfix_tokens;
   }
 }
 
@@ -380,14 +448,16 @@ public class Program {
     MATH_ERROR
   }
 
-  static bool debug = false;
+  public static bool debug = false;
   static bool shell = false;
   static bool print_postfix = false;
+  static bool print_syntax_tree = false;
 
   const OptionEntry[] options = {
     {"debug", 'd', 0, OptionArg.NONE, ref debug, "Print debug messages", null},
     {"shell", 's', 0, OptionArg.NONE, ref shell, "Enter interactive shell", null},
     {"print_postfix", 'p', 0, OptionArg.NONE, ref print_postfix, "Convert expression(s) to postfix", null},
+    {"print_syntax_tree", 't', 0, OptionArg.NONE, ref print_syntax_tree, "Print the syntax tree for the expression", null},
     { null }
   };
 
@@ -423,8 +493,18 @@ public class Program {
 
     if (print_postfix) {
       for (int i = 1; i<args.length; i++) {
-        string output = Parser.to_postfix (args[i]);
-        stdout.printf ("%s\n", output);
+        TokenList tokens = Parser.to_postfix (args[i]);
+        stdout.printf ("%s\n", tokens.to_string ());
+      }
+
+      return ExitCodes.SUCCESS;
+    }
+
+    if (print_syntax_tree) {
+      for (int i = 1; i<args.length; i++) {
+        TokenList tokens = Parser.to_postfix (args[i]);
+        var tree = new SyntaxTree.from_postfix (tokens);
+        stdout.printf ("%s\n", tree.to_string ());
       }
 
       return ExitCodes.SUCCESS;
