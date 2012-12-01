@@ -28,7 +28,18 @@ class AdvancedList<G> : ArrayList<G> {
   }
 }
 
-class TokenList : AdvancedList<Token> {}
+class TokenList : AdvancedList<Token> {
+  public string to_string () {
+    string output = "";
+
+    while (this.size > 0) {
+      var token = this.dequeue();
+      output += token.val;
+    }
+
+    return output;
+  }
+}
 
 
 enum TokenType {
@@ -163,7 +174,7 @@ class TreeNode : Object {
 class SyntaxTree : Object {
   TreeNode root = null;
 
-  string to_string () {
+  public string to_string () {
     if (this.root == null) 
       return "";
 
@@ -360,17 +371,11 @@ class Parser : Object {
     return result;
   }
 
-  public static string to_postfix (string input) {
+  public static TokenList to_postfix (string input) {
     var tokens = tokenize_string (input);
     var postfix_tokens = parse (tokens);
 
-    string output = "";
-    while (postfix_tokens.size > 0) {
-      var token = postfix_tokens.dequeue();
-      output += token.val;
-    }
-
-    return output;
+    return postfix_tokens;
   }
 }
 
@@ -419,11 +424,13 @@ public class Program {
   public static bool debug = false;
   static bool shell = false;
   static bool print_postfix = false;
+  static bool print_syntax_tree = false;
 
   const OptionEntry[] options = {
     {"debug", 'd', 0, OptionArg.NONE, ref debug, "Print debug messages", null},
     {"shell", 's', 0, OptionArg.NONE, ref shell, "Enter interactive shell", null},
     {"print_postfix", 'p', 0, OptionArg.NONE, ref print_postfix, "Convert expression(s) to postfix", null},
+    {"print_syntax_tree", 't', 0, OptionArg.NONE, ref print_syntax_tree, "Print the syntax tree for the expression", null},
     { null }
   };
 
@@ -459,8 +466,18 @@ public class Program {
 
     if (print_postfix) {
       for (int i = 1; i<args.length; i++) {
-        string output = Parser.to_postfix (args[i]);
-        stdout.printf ("%s\n", output);
+        TokenList tokens = Parser.to_postfix (args[i]);
+        stdout.printf ("%s\n", tokens.to_string ());
+      }
+
+      return ExitCodes.SUCCESS;
+    }
+
+    if (print_syntax_tree) {
+      for (int i = 1; i<args.length; i++) {
+        TokenList tokens = Parser.to_postfix (args[i]);
+        var tree = new SyntaxTree.from_postfix (tokens);
+        stdout.printf ("%s\n", tree.to_string ());
       }
 
       return ExitCodes.SUCCESS;
