@@ -8,12 +8,18 @@ A mathmatical expression evaluator written in [vala](https://live.gnome.org/Vala
 
 Tests are written in javascript. You will need [Mocha](http://visionmedia.github.com/mocha/) and [Chai](http://chaijs.com/). Install like so:
 
-	$ npm install mocha -g
-	$ npm install chai
+```bash
+$ npm install mocha -g
+$ npm install chai
+```
 
- * __make test -B__ - Run the tests in `test.js`
- * __make parser -B__ - Build the parser
- * __make all -B__ - Build and test parser
+### Makefile explanation
+
+```bash
+$ make test -B # Run the tests in `test.js`
+$ make parser -B # Build the parser
+$ make all -B # Build and test parser
+```
 
 Not supported on anything except linux (sorry, you're welcome to try it yourself).
 
@@ -28,15 +34,18 @@ Options:
 
 Examples:
 
-	$ ./parser 2+2
-	$ ./parser --shell
-	Entering interactive shell
-	Type 'exit' to exit
-	>2 - 2
-	0
-	>exit
-	$ ./parser --debug "4 + (5 - 12) * 34"
-	<lots of output>
+```bash
+$ ./parser 2+2
+4
+$ ./parser --shell
+Entering interactive shell
+Type 'exit' to exit
+>2 - 2
+0
+>exit
+$ ./parser --debug "4 + (5 - 12) * 34"
+# lots of output
+```
 
 ----------
 
