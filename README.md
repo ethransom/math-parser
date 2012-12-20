@@ -16,9 +16,9 @@ $ npm install chai
 ### Makefile explanation
 
 ```bash
-$ make test -B # Run the tests in `test.js`
-$ make parser -B # Build the parser
-$ make all -B # Build and test parser
+$ make test # Run the tests in `test.js`
+$ make parser # Build the parser
+$ make all # Build and test parser
 ```
 
 Not supported on anything except linux (sorry, you're welcome to try it yourself).
