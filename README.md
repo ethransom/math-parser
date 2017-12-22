@@ -6,7 +6,7 @@ A mathmatical expression evaluator written in [vala](https://live.gnome.org/Vala
 
 ## Hacking
 
-Tests are written in javascript. You will need [Mocha](http://visionmedia.github.com/mocha/) and [Chai](http://chaijs.com/). Install like so:
+Tests are written in javascript. You will need [Mocha](http://mochajs.org/) and [Chai](http://chaijs.com/). Install like so:
 
 	$ npm install mocha -g
 	$ npm install chai
